@@ -1,0 +1,6 @@
+PyExifTool
+pylibjpeg[all]
+tqdm
+numpy
+matplotlib
+seaborn

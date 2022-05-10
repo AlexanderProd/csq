@@ -18,7 +18,8 @@ class CSQReader():
         self.imgs = []
         self.index = 0
         self.et = exiftool.ExifTool()
-        self.et.start()
+        self.etHelper = exiftool.ExifToolHelper()
+        self.et.run()
 
     def _populate_list(self):
 
@@ -51,10 +52,11 @@ class CSQReader():
                 return None
 
         im = self.imgs[self.index]
-        self.index+=1
 
-        raw, metadata = extract_data(im, self.et)
-        thermal_im = raw2temp(raw, metadata)
+        raw, metadata = extract_data(im, self.etHelper)
+        print(metadata)
+        thermal_im = raw2temp(raw, metadata[self.index])
+        self.index+=1
 
         return thermal_im
 
@@ -86,14 +88,14 @@ class CSQReader():
         self.reader.close()
 
 
-def extract_data(bin, et): # binary to raw image
+def extract_data(bin, etHelper): # binary to raw image
 
     with tempfile.NamedTemporaryFile() as fp:
         fp.write(bin)
         fp.flush()
         
         fname = fp.name
-        metadata = et.get_metadata(fname)
+        metadata = etHelper.get_metadata(fname)
 
         binary = subprocess.check_output(['exiftool', '-b', '-RawThermalImage', fname])
         raw = decode(binary)
