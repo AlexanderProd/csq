@@ -54,7 +54,6 @@ class CSQReader():
         im = self.imgs[self.index]
 
         raw, metadata = extract_data(im, self.etHelper)
-        print(metadata)
         thermal_im = raw2temp(raw, metadata[self.index])
         self.index+=1
 
