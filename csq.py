@@ -116,8 +116,8 @@ def raw2temp(raw, metadata):
     PF = metadata['FLIR:PlanckF']
     PO = metadata['FLIR:PlanckO']
     PR2 = metadata['FLIR:PlanckR2']
-    ATA1 = metadata['FLIR:AtmosphericTransAlpha1']
-    ATA2 = metadata['FLIR:AtmosphericTransAlpha2']
+    ATA1 = float(metadata['FLIR:AtmosphericTransAlpha1'])
+    ATA2 = float(metadata['FLIR:AtmosphericTransAlpha2'])
     ATB1 = float(metadata['FLIR:AtmosphericTransBeta1'])
     ATB2 = float(metadata['FLIR:AtmosphericTransBeta2'])
     ATX = metadata['FLIR:AtmosphericTransX']
