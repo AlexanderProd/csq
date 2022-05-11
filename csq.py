@@ -152,21 +152,27 @@ def raw2temp(raw, metadata):
 
 if __name__ == '__main__':
 
+    from sys import argv
+    import seaborn as sns 
     import matplotlib.pyplot as plt
-    import time
-    from tqdm import trange
+    from matplotlib.colors import LinearSegmentedColormap
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    fname = 'FLIR0314.csq'
-    reader = CSQReader(fname)
-    start = time.time()
+    def plot_thermal(frame): 
 
-    for i in trange(20000):
-        frame = reader.next_frame()
+        sns.set_style('ticks')
+        fig = plt.figure()
+        ax = plt.gca()
+        plt.axis("off")
+        im = plt.imshow(frame, cmap = 'hot')
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(im, cax = cax)
+        cbar.ax.set_ylabel('Temperature ($^{\circ}$C)', fontsize = 14)
+        sns.despine()
+        plt.show()
 
-    end = time.time()
-    print(end - start)
+    reader = CSQReader(argv[1])
 
     frame = reader.next_frame()
-    plt.imshow(frame)
-    plt.colorbar()
-    plt.show()
+    plot_thermal(frame)
