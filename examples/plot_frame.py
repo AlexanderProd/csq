@@ -12,7 +12,7 @@ file_path = argv[1]
 reader = CSQReader(file_path)
 
 
-def plot_frame(frame):
+def plot_thermal(frame):
 
     ax = plt.gca()
     plt.axis("off")
@@ -25,4 +25,4 @@ def plot_frame(frame):
 
 
 frame = reader.frame_at(0)
-plot_frame(frame)
+plot_thermal(frame)
