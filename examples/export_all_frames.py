@@ -9,7 +9,7 @@ from csq import CSQReader
 
 file_path = argv[1]
 output = argv[2]
-filename = Path(path).name
+filename = Path(file_path).name
 reader = CSQReader(file_path)
 
 
