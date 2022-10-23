@@ -3,3 +3,4 @@ pylibjpeg[all]
 numpy
 matplotlib
 seaborn
+opencv-python
