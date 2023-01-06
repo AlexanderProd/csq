@@ -103,6 +103,13 @@ You can use the `ffmpeg` commandline application to easily create a video file f
 $ ffmpeg -r 30 -f image2 -i filename_%d.png -vcodec libx264 -crf 22 -pix_fmt yuv420p -vf 'scale=-2:min(1080\,trunc(ih/2)*2)' out.mp4
 ```
 
+### Super Resolution
+
+To use the AI upscaling feature you have to download a tensorflow model from one of theses sources.
+
+- https://github.com/Saafke/EDSR_Tensorflow/tree/master/models
+- https://github.com/fannymonori/TF-LapSRN/tree/master/export
+
 ## References
 
 This project was inspired by the Thermimage package, which allows for FLIR thermal image analysis in R:
