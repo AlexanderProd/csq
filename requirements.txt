@@ -4,3 +4,4 @@ numpy
 matplotlib
 seaborn
 opencv-python
+opencv-contrib-python
