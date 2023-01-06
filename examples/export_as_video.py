@@ -47,8 +47,9 @@ def v1(args):
             img = img[:, :, :3]  # remove alpha channel
             img = img[..., ::-1]  # flip channels (RGB to BGR)
             img = np.uint8(img * 255)
-
-            img = sr.upsample(img)
+            
+            if args.upscale_video is True:
+                img = sr.upsample(img)
 
             video_writer.write(img)
 
