@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
 import os
 import matplotlib.pyplot as plt
@@ -6,28 +7,38 @@ from pathlib import Path
 import argparse
 from sys import path
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+
 
 path.append("../csq")
 from csq import CSQReader
 import cv2
 
 
-def export_thermal_image(frame):
-    colormap = plt.cm.inferno
+def export_thermal_image(frame, filter: LinearSegmentedColormap | str):
     norm = plt.Normalize(vmin=frame.min(), vmax=frame.max())
+
+    colormap = filter
+    if type(filter) == str:
+        colormap = plt.colormaps[filter]
+
     image = colormap(norm(frame))
     return image
 
 
-def v1(args):
-    input_file = args.input_file
-    output_video = args.output_video
-    fps = float(args.fps)
+def v1(
+    input_file: Path,
+    output_video: Path,
+    fps: int | float = 30,
+    upscale_video: bool = False,
+    filter: LinearSegmentedColormap | str = "hot",
+):
+    fps = float(fps)
     reader = CSQReader(input_file)
     video_writer = None
     sr = None
 
-    if args.upscale_video is True:
+    if upscale_video is True:
         sr = cv2.dnn_superres.DnnSuperResImpl_create()
         sr.readModel("models/EDSR_x4.pb")
         sr.setModel("edsr", 4)
@@ -35,7 +46,7 @@ def v1(args):
     while reader.next_frame() is not None:
         frame = reader.next_frame()
         if frame is not None:
-            img = export_thermal_image(frame)
+            img = export_thermal_image(frame, filter)
 
             if video_writer is None:
                 height, width, _ = img.shape
@@ -47,8 +58,8 @@ def v1(args):
             img = img[:, :, :3]  # remove alpha channel
             img = img[..., ::-1]  # flip channels (RGB to BGR)
             img = np.uint8(img * 255)
-            
-            if args.upscale_video is True:
+
+            if upscale_video is True:
                 img = sr.upsample(img)
 
             video_writer.write(img)
@@ -56,16 +67,18 @@ def v1(args):
     video_writer.release()
 
 
-def v2(args):
-    input_file = args.input_file
-    output_video = args.output_video
-    fps = float(args.fps)
+def v2(
+    input_file: Path,
+    output_video: Path,
+    fps: int | float = 30,
+    filter: LinearSegmentedColormap | str = "hot",
+):
     reader = CSQReader(input_file)
     video_writer = None
 
     reader._populate_list()
     for frame in reader.frames():
-        img = export_thermal_image(frame)
+        img = export_thermal_image(frame, filter)
 
         if video_writer is None:
             height, width, _ = img.shape
@@ -84,7 +97,7 @@ def v2(args):
 
 
 def main(args):
-    v1(args)
+    v1(input_file=args.input_file, output_video=args.output_video, fps=args.fps)
 
 
 if __name__ == "__main__":

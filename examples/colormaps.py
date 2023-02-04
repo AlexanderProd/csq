@@ -13,8 +13,10 @@ blue_green_red = LinearSegmentedColormap.from_list(
     "Blue, Green, Red", [(0, 0, 1), (0, 1, 0), (1, 0, 0)], N=100
 )
 cold_red = LinearSegmentedColormap.from_list("Cold Red", [(1, 0, 0), (0, 0, 0)], N=100)
-red_hot = LinearSegmentedColormap.from_list("Cold Red", [(0, 0, 0), (1, 0, 0)], N=100)
-green_hot = LinearSegmentedColormap.from_list("Cold Red", [(0, 0, 0), (0, 1, 0)], N=100)
+red_hot = LinearSegmentedColormap.from_list("Red Hot", [(0, 0, 0), (1, 0, 0)], N=100)
+green_hot = LinearSegmentedColormap.from_list(
+    "Green Hot", [(0, 0, 0), (0, 1, 0)], N=100
+)
 cold_red_boost = LinearSegmentedColormap.from_list(
     "Cold Red Boost", [(0.76, 0, 0), (0, 0, 0)], N=100
 )
