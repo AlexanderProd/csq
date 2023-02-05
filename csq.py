@@ -32,6 +32,8 @@ class CSQReader:
             return
 
         matches = list(MAGIC_SEQ.finditer(x))
+        if matches == []:
+            return
         start = matches[0].start()
 
         if self.leftover != b"":
