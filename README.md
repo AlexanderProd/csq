@@ -112,7 +112,7 @@ $ python3 examples/export_as_video.py -i example.csq -o output.mp4 --fps 30
 This examples exports a CSQ file as video files with different thermal filters. The first argument needs to be the input CSQ file and the second one an output directory.
 
 ```bash
-    python3 examples/export_as_video_all_filters.py ~/Documents/FLIR\ Aufnahmen/Erlangen_Wildschweingehege_2022-07-21/FLIR0115.csq ~/Downloads/FLIR0115/
+$ python3 examples/export_as_video_all_filters.py example.csq ./example/directory/
 ```
 
 ### Super Resolution
