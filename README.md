@@ -75,9 +75,13 @@ If you want to know how many frames a video has you can use the `count_frames()`
 print(reader.count_frames())
 ```
 
+## Examples
+
+There are some examples of use cases for exporting the CSQ files in different means in the `examples` directory.
+
 ### Export all frames
 
-If you want to export all frames of a video automatically, for example to create a mp4 video from them you can use the following script. An full example is also located in the examples directory of this repo.
+If you want to export all frames of a CSQ file as individual files automatically. An full example is also located in the examples directory of this repo.
 
 ```python
 def export_thermal_image(frame, name: str):
@@ -95,13 +99,28 @@ for frame in reader.frames():
     i += 1
 ```
 
-#### Create mp4 video file from frames
+### Export as Video
 
-You can use the `ffmpeg` commandline application to easily create a video file from a numbered amount of image files.
+The `export_as_video.py` file located in the `examples` directory can be used to export a CSQ as a video file. It has a flag to set the framerate of the video, the default is 30 fps.
 
 ```bash
-$ ffmpeg -r 30 -f image2 -i filename_%d.png -vcodec libx264 -crf 22 -pix_fmt yuv420p -vf 'scale=-2:min(1080\,trunc(ih/2)*2)' out.mp4
+$ python3 examples/export_as_video.py -i example.csq -o output.mp4 --fps 30
 ```
+
+### Export as video all filters
+
+This examples exports a CSQ file as video files with different thermal filters. The first argument needs to be the input CSQ file and the second one an output directory.
+
+```bash
+    python3 examples/export_as_video_all_filters.py ~/Documents/FLIR\ Aufnahmen/Erlangen_Wildschweingehege_2022-07-21/FLIR0115.csq ~/Downloads/FLIR0115/
+```
+
+### Super Resolution
+
+To use the AI upscaling feature you have to download a tensorflow model from one of theses sources and edit the `export_as_video.py` file as well as setting the `--upscale_video` flag to true.
+
+- https://github.com/Saafke/EDSR_Tensorflow/tree/master/models
+- https://github.com/fannymonori/TF-LapSRN/tree/master/export
 
 ## References
 
