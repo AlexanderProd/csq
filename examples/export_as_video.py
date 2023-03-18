@@ -8,6 +8,7 @@ import argparse
 from sys import path
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+import time
 
 
 path.append("../csq")
@@ -37,11 +38,16 @@ def v1(
     reader = CSQReader(input_file)
     video_writer = None
     sr = None
+    scaling_factor = 1
 
     if upscale_video is True:
+        print("Upscaling video output")
         sr = cv2.dnn_superres.DnnSuperResImpl_create()
         sr.readModel("models/EDSR_x4.pb")
+        sr.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        sr.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
         sr.setModel("edsr", 4)
+        scaling_factor = 4
 
     while reader.next_frame() is not None:
         frame = reader.next_frame()
@@ -52,7 +58,10 @@ def v1(
                 height, width, _ = img.shape
                 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
                 video_writer = cv2.VideoWriter(
-                    output_video, fourcc, fps, (int(width), int(height))
+                    output_video,
+                    fourcc,
+                    fps,
+                    (int(width * scaling_factor), int(height * scaling_factor)),
                 )
 
             img = img[:, :, :3]  # remove alpha channel
@@ -97,7 +106,15 @@ def v2(
 
 
 def main(args):
-    v1(input_file=args.input_file, output_video=args.output_video, fps=args.fps)
+    start = time.time()
+    v1(
+        input_file=args.input_file,
+        output_video=args.output_video,
+        fps=args.fps,
+        upscale_video=args.upscale_video,
+    )
+    end = time.time()
+    print("Exporting video took {:.6f} seconds".format(end - start))
 
 
 if __name__ == "__main__":
