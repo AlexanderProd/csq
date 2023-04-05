@@ -23,7 +23,6 @@ class CSQReader:
         self.et.run()
 
     def _populate_list(self):
-
         self.imgs = []
         self.index = 0
 
@@ -50,7 +49,6 @@ class CSQReader:
         self.leftover = x[end:]
 
     def next_frame(self):
-
         if self.index >= len(self.imgs):
             self._populate_list()
 
@@ -66,7 +64,6 @@ class CSQReader:
         return thermal_im
 
     def skip_frame(self):
-
         if self.index >= len(self.imgs):
             self._populate_list()
 
@@ -77,7 +74,6 @@ class CSQReader:
         return True
 
     def count_frames(self):
-
         self.nframes = 0
         while self.skip_frame():
             self.nframes += 1
@@ -86,7 +82,6 @@ class CSQReader:
         return self.nframes
 
     def frame_at(self, pos: int):
-
         if self.nframes == None:
             self.count_frames()
 
@@ -103,20 +98,17 @@ class CSQReader:
         return self.next_frame()
 
     def frames(self):
-
+        self._populate_list()
         for im in self.imgs:
-            self.index += 1
-            if self.index >= len(self.imgs):
-                self._populate_list()
-                yield from self.frames()
-
             raw, metadata = extract_data(im, self.etHelper)
             thermal_im = raw2temp(raw, metadata[0])
-
             yield thermal_im
 
-    def get_metadata(self):
+        if len(self.imgs) > 0:
+            self.index = 0
+            yield from self.frames()
 
+    def get_metadata(self):
         if self.index >= len(self.imgs):
             self._populate_list()
 
@@ -137,7 +129,6 @@ class CSQReader:
 
 
 def extract_data(bin, etHelper):  # binary to raw image
-
     with tempfile.NamedTemporaryFile() as fp:
         fp.write(bin)
         fp.flush()
@@ -152,7 +143,6 @@ def extract_data(bin, etHelper):  # binary to raw image
 
 
 def raw2temp(raw, metadata):
-
     E = metadata["FLIR:Emissivity"]
     OD = metadata["FLIR:ObjectDistance"]
     RTemp = metadata["FLIR:ReflectedApparentTemperature"]
@@ -225,7 +215,6 @@ if __name__ == "__main__":
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     def plot_thermal(frame):
-
         sns.set_style("ticks")
         fig = plt.figure()
         ax = plt.gca()

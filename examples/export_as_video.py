@@ -9,11 +9,18 @@ from sys import path
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 import time
-
+from colormaps import green_hot, cold_green, red_hot, cold_red, ironbow, hottest
 
 path.append("../csq")
 from csq import CSQReader
 import cv2
+
+
+def extract_dnn_model_name_and_scale(model_path: Path) -> tuple[str, int]:
+    model_name = model_path.split(os.path.sep)[-1].split("_")[0].lower()
+    model_scale = model_path.split("_x")[-1]
+    model_scale = int(model_scale[: model_scale.find(".")])
+    return model_name, model_scale
 
 
 def export_thermal_image(frame, filter: LinearSegmentedColormap | str):
@@ -31,23 +38,13 @@ def v1(
     input_file: Path,
     output_video: Path,
     fps: int | float = 30,
-    upscale_video: bool = False,
-    filter: LinearSegmentedColormap | str = "hot",
+    sr: cv2.dnn_superres.DnnSuperResImpl = None,
+    scaling_factor: int = 1,
+    filter: LinearSegmentedColormap | str = "ironbow",
 ):
     fps = float(fps)
     reader = CSQReader(input_file)
     video_writer = None
-    sr = None
-    scaling_factor = 1
-
-    if upscale_video is True:
-        print("Upscaling video output")
-        sr = cv2.dnn_superres.DnnSuperResImpl_create()
-        sr.readModel("models/EDSR_x4.pb")
-        sr.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-        sr.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-        sr.setModel("edsr", 4)
-        scaling_factor = 4
 
     while reader.next_frame() is not None:
         frame = reader.next_frame()
@@ -68,7 +65,7 @@ def v1(
             img = img[..., ::-1]  # flip channels (RGB to BGR)
             img = np.uint8(img * 255)
 
-            if upscale_video is True:
+            if sr is not None:
                 img = sr.upsample(img)
 
             video_writer.write(img)
@@ -80,6 +77,8 @@ def v2(
     input_file: Path,
     output_video: Path,
     fps: int | float = 30,
+    sr: cv2.dnn_superres.DnnSuperResImpl = None,
+    scaling_factor: int = 1,
     filter: LinearSegmentedColormap | str = "hot",
 ):
     reader = CSQReader(input_file)
@@ -93,13 +92,19 @@ def v2(
             height, width, _ = img.shape
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")
             video_writer = cv2.VideoWriter(
-                output_video, fourcc, fps, (int(width), int(height))
+                output_video,
+                fourcc,
+                fps,
+                (int(width * scaling_factor), int(height * scaling_factor)),
             )
 
         img = img[:, :, :3]  # remove alpha channel
         img = img[..., ::-1]  # flip channels (RGB to BGR)
-
         img = np.uint8(img * 255)
+
+        if sr is not None:
+            img = sr.upsample(img)
+
         video_writer.write(img)
 
     video_writer.release()
@@ -107,14 +112,31 @@ def v2(
 
 def main(args):
     start = time.time()
-    v1(
+    sr = None
+    scaling_factor = 1
+
+    if args.dnn_model is not None:
+        print(args.dnn_model)
+        print("Upscaling video output")
+        sr = cv2.dnn_superres.DnnSuperResImpl_create()
+        sr.readModel(args.dnn_model)
+        sr.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+        sr.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
+        model_name, scaling_factor = extract_dnn_model_name_and_scale(args.dnn_model)
+        sr.setModel(model_name, scaling_factor)
+        scaling_factor = scaling_factor
+
+    v2(
         input_file=args.input_file,
         output_video=args.output_video,
+        scaling_factor=scaling_factor,
+        filter=ironbow,
         fps=args.fps,
-        upscale_video=args.upscale_video,
+        sr=sr,
     )
     end = time.time()
-    print("Exporting video took {:.6f} seconds".format(end - start))
+    print("\n Exporting video took {:.6f} seconds".format(end - start))
 
 
 if __name__ == "__main__":
@@ -132,10 +154,9 @@ if __name__ == "__main__":
         default=30.0,
     )
     parser.add_argument(
-        "--upscale_video",
-        help="Increase the output video resolution using ai upscaling",
-        type=bool,
-        default=False,
+        "--dnn_model",
+        help="Path to the DNN model to use for upscaling.",
+        type=str,
     )
     args = parser.parse_args()
 
