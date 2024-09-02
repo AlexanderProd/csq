@@ -1,8 +1,14 @@
 # csq
 
-This repository provides a way for thermal videos acquired by a FLIR camera to be read in Python. Only files with the `.csq` extension are compatible with this code.
+This repository provides a way for thermal videos acquired by a FLIR camera to be read in Python.
 
-The `.csq` file format stores each image in the thermal video in 16-bit binary form. Using some calibration constants from the thermal camera, the temperature data can be calculated, allowing the image to be expressed in degrees Celcius. With this repository, you can directly obtain the temperature values without having to worry about this conversion!
+The `.csq` file format stores each image in the thermal video in 16-bit binary form. The image itself is encoded in the [JPEG-LS](https://jpeg.org/jpegls/) standard and decoded with the [libjpeg](https://pypi.org/project/pylibjpeg-libjpeg/) library.
+
+Using some calibration constants from the thermal camera which are read using [exiftool](https://exiftool.org/), the temperature data can be calculated, allowing the image to be expressed in degrees Celcius. With this repository, you can directly obtain the temperature values without having to worry about this conversion!
+
+## Prerequisites
+
+You need to have [exiftool](https://exiftool.org/) installed on your system.
 
 ## Installation
 
