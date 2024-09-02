@@ -12,14 +12,14 @@ pip install -r requirements.txt
 
 ## Tutorial
 
-Here I will use an example thermal video to show you how to use this repository. If you would like to follow along, you can download `cat.csq` from this Google Drive folder: https://drive.google.com/drive/folders/1aT98zkNw8DwJ1ImS4mUrWMhvL5NjCS7S?usp=sharing.
+Here I will use an example thermal video to show you how to use this repository. If you would like to follow along, you can download `hog.csq` from this Google Drive [link](https://drive.google.com/file/d/13oGxBDKDb_l-7rfmZ_nuTFfdV8ycADhm/view?usp=sharing).
 
-First, import the module and construct a CSQReader object from the path to `cat.csq`:
+First, import the module and construct a CSQReader object from the path to `hog.csq`:
 
 ```python
 from csq import CSQReader
 
-path = '/Users/tuthill/Downloads/analysis/videos/cat.csq'
+path = '~/Downloads/hog.csq'
 reader = CSQReader(path)
 ```
 
@@ -47,7 +47,7 @@ frame = reader.next_frame()
 plot_thermal(frame)
 ```
 
-![cat](https://github.com/katierupp/csq/blob/main/examples/frame1.png?raw=true)
+<img src="assets/frame1.png" />
 
 When analyzing thermal imaging data, you may want to perform a certain operation on each frame. For example, maybe you want to extract the maximum temperature at each frame in the video. To determine this, you can simply create a loop to continuously call the `next_frame()` function:
 
